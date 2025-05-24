@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "339065195318",
+    "project_id": "aird18bookingapp",
+    "storage_bucket": "aird18bookingapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:339065195318:android:bf80473ff301dec5d78197",
+        "android_client_info": {
+          "package_name": "com.ptit.aird18bookingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "339065195318-04sls3hj1i9s2c3v42gjs0eair3t2k8p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBP857rAj-Or1B5K0X-amuVSJf520E1jlo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "339065195318-04sls3hj1i9s2c3v42gjs0eair3t2k8p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
