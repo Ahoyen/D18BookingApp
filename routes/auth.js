@@ -75,25 +75,28 @@ router.post('/api/auth/login', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-router.get('/api/user/profile', async (req, res) => {
-    try {
-      const sessionId = req.headers.cookie // hoặc req.cookies.sessionId (nếu dùng cookie-parser)
-      if (!sessionId) {
-        return res.status(401).json({ success: false, error: 'Unauthorized' });
-      }
+
+
+
+// router.get('/api/user/profile', async (req, res) => {
+//     try {
+//       const sessionId = req.headers.cookie // hoặc req.cookies.sessionId (nếu dùng cookie-parser)
+//       if (!sessionId) {
+//         return res.status(401).json({ success: false, error: 'Unauthorized' });
+//       }
   
-      // Tìm user theo _id trong sessionId
-      const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
+//       // Tìm user theo _id trong sessionId
+//       const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
   
-      if (!user) {
-        return res.status(404).json({ success: false, error: 'User not found' });
-      }
+//       if (!user) {
+//         return res.status(404).json({ success: false, error: 'User not found' });
+//       }
   
-      res.status(200).json({ success: true, data: user });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: 'Server error' });
-    }
-  });
+//       res.status(200).json({ success: true, data: user });
+//     } catch (error) {
+//       console.error(error);
+//       res.status(500).json({ success: false, error: 'Server error' });
+//     }
+//   });
   
 module.exports = router;
