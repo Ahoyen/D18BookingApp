@@ -81,116 +81,139 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 
-// Register
+// POST /api/auth/register
 router.post('/api/auth/register', async (req, res) => {
-    try {
-        const {
-            firstName,
-            lastName,
-            email,
-            password,
-            phoneNumber,
-            sex,
-            birthday
-        } = req.body;
+  try {
+    const { firstName, lastName, phoneNumber, email, password, sex, birthday } = req.body;
 
-        // Kiểm tra trường bắt buộc
-        if (!firstName || !lastName || !email || !password) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        // Kiểm tra email đã tồn tại chưa
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ error: 'Email already registered' });
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Auto-increment ID
-        const lastUser = await User.findOne().sort({ id: -1 }).lean();
-        const nextId = lastUser?.id ? lastUser.id + 1 : 1;
-
-        const currentTime = Date.now();
-        const sexNormalized = sex
-            ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
-            : undefined;
-
-        const newUser = new User({
-            id: nextId,
-            status: true,
-            firstName,
-            lastName,
-            fullName: `${firstName} ${lastName}`,
-            email,
-            password: hashedPassword,
-            phoneNumber,
-            sex: sexNormalized,
-            birthday,
-            createdDate: currentTime,
-            updatedDate: currentTime,
-            role: 'user',
-            phoneVerified: false,
-            supremeHost: false
-        });
-
-        await newUser.save();
-
-        const { password: _, ...userData } = newUser._doc;
-
-        return res.status(201).json({
-            success: true,
-            message: 'User registered successfully',
-            data: userData
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Server error' });
+    // Validate required fields
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Missing required fields'
+      });
     }
+
+    // Check if email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Email already registered'
+      });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Auto-increment id
+    const lastUser = await User.findOne().sort({ id: -1 }).lean();
+    const nextId = lastUser ? lastUser.id + 1 : 1;
+
+    // Normalize sex value
+    const sexNormalized = sex
+      ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
+      : undefined;
+
+    const currentTime = Date.now();
+
+    // Create new user document
+    const newUser = new User({
+      id: nextId,
+      status: true,
+      createdDate: currentTime,
+      updatedDate: currentTime,
+      firstName,
+      lastName,
+      fullName: `${firstName} ${lastName}`,
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      sex: sexNormalized,
+      birthday,
+      role: 'user',
+      phoneVerified: false,
+      supremeHost: false
+    });
+
+    await newUser.save();
+
+    // Remove password before sending response
+    const { password: _, ...userData } = newUser._doc;
+
+    res.status(201).json({
+      success: true,
+      data: userData,
+      error: null
+    });
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: 'Server error'
+    });
+  }
 });
 
-// Login
+// POST /api/auth/login
 router.post('/api/auth/login', async (req, res) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Missing email or password' });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ error: 'Invalid credentials' });
-        }
-
-        res.setHeader('Set-Cookie', `sessionId=${user._id}; HttpOnly; Path=/;`);
-
-        const { password: _, ...userData } = user._doc;
-        userData.fullName = `${user.firstName} ${user.lastName}`;
-        userData.createdDate = new Date(user.createdAt).getTime();
-        userData.updatedDate = new Date(user.updatedAt).getTime();
-
-        if (typeof userData.addressDetails !== 'object') {
-            userData.addressDetails = null;
-        }
-        if (typeof userData.about !== 'object') {
-            userData.about = null;
-        }
-
-        res.status(200).json({
-            success: true,
-            data: userData
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Server error' });
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Missing email or password'
+      });
     }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Invalid credentials'
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Invalid credentials'
+      });
+    }
+
+    // Set HttpOnly cookie for session (optional)
+    res.setHeader('Set-Cookie', `sessionId=${user._id}; HttpOnly; Path=/;`);
+
+    const { password: _, ...userData } = user._doc;
+    userData.fullName = `${user.firstName} ${user.lastName}`;
+    userData.createdDate = new Date(user.createdAt).getTime();
+    userData.updatedDate = new Date(user.updatedAt).getTime();
+
+    // Ensure about and addressDetails are null if not object
+    if (typeof userData.about !== 'object') userData.about = null;
+    if (typeof userData.addressDetails !== 'object') userData.addressDetails = null;
+
+    res.status(200).json({
+      success: true,
+      data: userData,
+      error: null
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      data: null,
+      error: 'Server error'
+    });
+  }
 });
 
 module.exports = router;
