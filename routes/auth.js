@@ -84,28 +84,39 @@ const User = require('../models/User');
 // Register
 router.post('/api/auth/register', async (req, res) => {
     try {
-        const { firstName, lastName, email, password, phoneNumber, sex, birthday } = req.body;
+        const {
+            firstName,
+            lastName,
+            email,
+            password,
+            phoneNumber,
+            sex,
+            birthday
+        } = req.body;
 
+        // Kiểm tra trường bắt buộc
         if (!firstName || !lastName || !email || !password) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        // Kiểm tra email đã tồn tại chưa
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
+        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Auto-increment ID (OPTIONAL)
+        // Auto-increment ID
         const lastUser = await User.findOne().sort({ id: -1 }).lean();
-        let nextId = 1;
-        if (lastUser && typeof lastUser.id === 'number') {
-            nextId = lastUser.id + 1;
-        }
+        const nextId = lastUser?.id ? lastUser.id + 1 : 1;
 
         const currentTime = Date.now();
-        const sexNormalized = sex ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase() : undefined;
+        const sexNormalized = sex
+            ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase()
+            : undefined;
+
         const newUser = new User({
             id: nextId,
             status: true,
@@ -128,14 +139,14 @@ router.post('/api/auth/register', async (req, res) => {
 
         const { password: _, ...userData } = newUser._doc;
 
-        res.status(201).json({ 
+        return res.status(201).json({
             success: true,
-            message: 'User registered successfully', 
-            data: userData 
+            message: 'User registered successfully',
+            data: userData
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
