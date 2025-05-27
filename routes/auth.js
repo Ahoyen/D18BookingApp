@@ -16,16 +16,16 @@ router.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
-        const lastUser = await User.findOne().sort({ id: -1 }).lean();
-        let nextId = 1;
-        if (lastUser && typeof lastUser.id === 'number') {
-          nextId = lastUser.id + 1;
-        }
+        // const lastUser = await User.findOne().sort({ id: -1 }).lean();
+        // let nextId = 1;
+        // if (lastUser && typeof lastUser.id === 'number') {
+        //   nextId = lastUser.id + 1;
+        // }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
-            id: nextId,
+            // id: nextId,
             firstName,
             lastName,
             email,
