@@ -165,6 +165,13 @@ router.post('/api/auth/login', async (req, res) => {
         userData.createdDate = new Date(user.createdAt).getTime();
         userData.updatedDate = new Date(user.updatedAt).getTime();
 
+        if (typeof userData.addressDetails !== 'object') {
+            userData.addressDetails = null;
+        }
+        if (typeof userData.about !== 'object') {
+            userData.about = null;
+        }
+
         res.status(200).json({
             success: true,
             data: userData
