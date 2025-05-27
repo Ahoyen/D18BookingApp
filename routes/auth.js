@@ -16,9 +16,16 @@ router.post('/api/auth/register', async (req, res) => {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
+        const lastUser = await User.findOne().sort({ id: -1 }).lean();
+        let nextId = 1;
+        if (lastUser && typeof lastUser.id === 'number') {
+          nextId = lastUser.id + 1;
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = new User({
+            id: nextId,
             firstName,
             lastName,
             email,
@@ -68,5 +75,25 @@ router.post('/api/auth/login', async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
+router.get('/api/user/profile', async (req, res) => {
+    try {
+      const sessionId = req.headers.cookie // hoặc req.cookies.sessionId (nếu dùng cookie-parser)
+      if (!sessionId) {
+        return res.status(401).json({ success: false, error: 'Unauthorized' });
+      }
+  
+      // Tìm user theo _id trong sessionId
+      const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
+  
+      if (!user) {
+        return res.status(404).json({ success: false, error: 'User not found' });
+      }
+  
+      res.status(200).json({ success: true, data: user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, error: 'Server error' });
+    }
+  });
+  
 module.exports = router;
