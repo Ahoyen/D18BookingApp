@@ -105,7 +105,7 @@ router.post('/api/auth/register', async (req, res) => {
         }
 
         const currentTime = Date.now();
-
+        const sexNormalized = sex ? sex.charAt(0).toUpperCase() + sex.slice(1).toLowerCase() : undefined;
         const newUser = new User({
             id: nextId,
             status: true,
@@ -115,7 +115,7 @@ router.post('/api/auth/register', async (req, res) => {
             email,
             password: hashedPassword,
             phoneNumber,
-            sex,
+            sex: sexNormalized,
             birthday,
             createdDate: currentTime,
             updatedDate: currentTime,
