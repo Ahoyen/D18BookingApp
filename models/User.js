@@ -49,10 +49,12 @@ const userSchema = new mongoose.Schema({
   avatarPath: { type: String },
 
   fullPathAddress: { type: String },
+  password: { type: String, required: true },
 
   addressDetails: { type: mongoose.Schema.Types.Mixed, default: null },
 
   supremeHost: { type: Boolean, default: false }
+  
 
 }, { timestamps: true });
 
