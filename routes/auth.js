@@ -80,6 +80,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const Role = require('../models/Role');
 
 // POST /api/auth/register
 router.post('/api/auth/register', async (req, res) => {
@@ -111,6 +112,8 @@ router.post('/api/auth/register', async (req, res) => {
     // Auto-increment id
     const lastUser = await User.findOne().sort({ id: -1 }).lean();
     const nextId = lastUser ? lastUser.id + 1 : 1;
+
+    const userRole = await Role.findOne({ id: 1 }); 
 
     // Normalize sex value
     const sexNormalized = sex
@@ -171,8 +174,9 @@ router.post('/api/auth/login', async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email }).select('+password');
+    // const user = await User.findOne({ email }).select('+password');
 
+    const user = await User.findOne({ email }).populate('role').select('+password');
     if (!user) {
       return res.status(400).json({
         success: false,
@@ -180,6 +184,7 @@ router.post('/api/auth/login', async (req, res) => {
         error: 'Invalid credentials'
       });
     }
+
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

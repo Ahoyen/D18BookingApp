@@ -37,7 +37,9 @@ const userSchema = new mongoose.Schema({
   //   enum: ['user', 'admin', 'host'], // bạn cần map enum Role Java sang string này
   //   default: 'user'
   // },
-
+  roleId: { type: Number, required: true, default: 1 }, // Default roleId = 1 (user)
+  role: { type: mongoose.Schema.Types.ObjectId, ref: 'Role' },
+  
   phoneNumber: { type: String },
 
   phoneVerified: { type: Boolean, default: false },
