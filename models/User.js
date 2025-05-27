@@ -22,7 +22,11 @@ const userSchema = new mongoose.Schema({
   updatedDate: { type: Number }, // timestamp
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  sex: { type: String, enum: ['Male', 'Female', 'Other'] },
+  // sex: { type: String, enum: ['Male', 'Female', 'Other'] },
+  sex: {
+    type: String,
+    enum: ['male', 'female', 'other', 'MALE', 'FEMALE', 'OTHER'],
+  },
   birthday: { type: String }, // dùng String để khớp Android, hoặc Date nếu xử lý riêng
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
