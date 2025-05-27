@@ -133,7 +133,7 @@ router.post('/api/auth/register', async (req, res) => {
       phoneNumber,
       sex: sexNormalized,
       birthday,
-      role: 'user',
+    //   role: 'user',
       phoneVerified: false,
       supremeHost: false
     });
@@ -172,7 +172,7 @@ router.post('/api/auth/login', async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user) {
       return res.status(400).json({
         success: false,

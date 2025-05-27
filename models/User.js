@@ -32,11 +32,11 @@ const userSchema = new mongoose.Schema({
 
   cookie: { type: String },
 
-  role: { 
-    type: String,
-    enum: ['user', 'admin', 'host'], // bạn cần map enum Role Java sang string này
-    default: 'user'
-  },
+  // role: { 
+  //   type: String,
+  //   enum: ['user', 'admin', 'host'], // bạn cần map enum Role Java sang string này
+  //   default: 'user'
+  // },
 
   phoneNumber: { type: String },
 
