@@ -6,6 +6,7 @@ const Amenity = require('../models/Amenity');
 const Rule = require('../models/Rule');
 const User = require('../models/User');
 const Review = require('../models/Review');
+const Booking = require('../models/Booking');
 
 // router.post('/api/rooms', async (req, res) => {
 //     try {
