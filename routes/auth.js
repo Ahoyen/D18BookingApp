@@ -7,7 +7,7 @@ const Role = require('../models/Role');
 // POST /api/auth/register
 router.post('/api/auth/register', async (req, res) => {
   try {
-    const { firstName, lastName, phoneNumber, email, password, sex, birthday } = req.body;
+    const { firstName, lastName, phoneNumber, email, password, sex, birthday, avatarPath } = req.body;
 
     // Validate required fields
     if (!firstName || !lastName || !email || !password) {
@@ -43,7 +43,7 @@ router.post('/api/auth/register', async (req, res) => {
       : undefined;
 
     const currentTime = Date.now();
-
+  
     // Create new user document
     const newUser = new User({
       id: nextId,
