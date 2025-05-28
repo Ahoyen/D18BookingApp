@@ -136,7 +136,6 @@ router.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// module.exports = router;
 
 router.get('/api/user/profile', async (req, res) => {
     try {
@@ -160,6 +159,7 @@ router.get('/api/user/profile', async (req, res) => {
       console.error(error);
       res.status(500).json({ success: false, error: 'Server error' });
     }
+    console.log('Cookies:', req.cookies);
   });
   
 module.exports = router;
