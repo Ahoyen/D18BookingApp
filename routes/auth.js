@@ -59,7 +59,8 @@ router.post('/api/auth/register', async (req, res) => {
       sex: sexNormalized,
       birthday,
       phoneVerified: false,
-      supremeHost: false
+      supremeHost: false,
+      avatarPath: avatarPath || null 
     });
 
     await newUser.save();
@@ -144,9 +145,8 @@ router.get('/api/user/profile', async (req, res) => {
       if (!sessionId) {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
       }
-  
-      // Tìm user theo _id trong sessionId
       // const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
+        // Tìm user theo id trong sessionId
       const userId = parseInt(req.cookies.sessionId, 10);
       const user = await User.findOne({ id: userId }).select('-password -_id -__v');
   
@@ -159,7 +159,6 @@ router.get('/api/user/profile', async (req, res) => {
       console.error(error);
       res.status(500).json({ success: false, error: 'Server error' });
     }
-    console.log('Cookies:', req.cookies);
   });
   
 module.exports = router;
