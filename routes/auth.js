@@ -111,7 +111,7 @@ router.post('/api/auth/login', async (req, res) => {
       });
     }
     // Set HttpOnly cookie for session 
-    res.setHeader('Set-Cookie', `sessionId=${user._id}; HttpOnly; Path=/;`);
+    res.setHeader('Set-Cookie', `sessionId=${user.id}; HttpOnly; Path=/;`);
 
     const { password: _, ...userData } = user._doc;
     userData.fullName = `${user.firstName} ${user.lastName}`;
@@ -136,17 +136,20 @@ router.post('/api/auth/login', async (req, res) => {
   }
 });
 
-module.exports = router;
+// module.exports = router;
 
 router.get('/api/user/profile', async (req, res) => {
     try {
-      const sessionId = req.headers.cookie // hoặc req.cookies.sessionId (nếu dùng cookie-parser)
+      // const sessionId = req.headers.cookie 
+      const sessionId = req.cookies.sessionId; //cookie-parser
       if (!sessionId) {
         return res.status(401).json({ success: false, error: 'Unauthorized' });
       }
   
       // Tìm user theo _id trong sessionId
-      const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
+      // const user = await User.findById(sessionId, { password: 0, _id: 0, __v: 0 });
+      const userId = parseInt(req.cookies.sessionId, 10);
+      const user = await User.findOne({ id: userId }).select('-password -_id -__v');
   
       if (!user) {
         return res.status(404).json({ success: false, error: 'User not found' });
