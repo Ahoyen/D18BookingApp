@@ -73,9 +73,7 @@ router.post('/api/rooms', async (req, res) => {
       guest,
       bedroom,
       bathroom,
-      bed,
-      // amenities, 
-      // rules,     
+      bed,  
       amenities: amenities && amenities.length > 0 ? amenities : defaultAmenities,
       rules: rules && rules.length > 0 ? rules : defaultRules,
       host       
