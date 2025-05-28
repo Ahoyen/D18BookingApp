@@ -13,7 +13,6 @@ const mongoose = require('mongoose');
 //   stayType: String,
 // });
 
-// module.exports = mongoose.model('Room', RoomSchema);
 const RoomSchema = new mongoose.Schema({
   id: { type: Number, required: true, unique: true },
   name: String,

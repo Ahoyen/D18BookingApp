@@ -5,6 +5,7 @@ const Room = require('../models/Room');
 const Amenity = require('../models/Amenity');
 const Rule = require('../models/Rule');
 const User = require('../models/User');
+const Review = require('../models/Review');
 
 // router.post('/api/rooms', async (req, res) => {
 //     try {
@@ -123,7 +124,6 @@ router.get('/api/rooms', async (req, res) => {
       if (!room) {
         return res.status(404).json({ success: false, message: 'Room not found' });
       }
-  
       // Lấy reviews theo roomId
       const reviews = await Review.find({ roomId: id }).lean();
   
