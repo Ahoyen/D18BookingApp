@@ -160,5 +160,23 @@ router.get('/api/user/profile', async (req, res) => {
       res.status(500).json({ success: false, error: 'Server error' });
     }
   });
+  router.put('/api/auth/reset-password', async (req, res) => {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+        return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Password updated successfully' });
+  });
   
 module.exports = router;
