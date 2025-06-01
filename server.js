@@ -7,7 +7,7 @@ const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/category')
 const roomRoutes = require('./routes/room')
 const bookingRoutes = require('./routes/booking');
-const wishlistRoutes = require('./routes/wishlist')
+// const wishlistRoutes = require('./routes/wishlist')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -37,7 +37,7 @@ app.use(roomRoutes)
 // Route booking
 app.use(bookingRoutes)
 // Route wishlist
-app.use(wishlistRoutes)
+// app.use(wishlistRoutes)
 
 
 
