@@ -19,7 +19,9 @@ router.get('/api/user/wishlists', async (req, res) => {
       return res.json({ success: true, data: [], error: null });
     }
 
-    const rooms = await Room.find({ id: { $in: wishlist.roomIds } });
+    const rooms = await Room.find({
+        id: { $in: wishlist.roomIds.map(id => id.toString()) }
+      });
     const data = rooms.map(room => ({
       id: room.id,
       images: room.thumbnail || '',
