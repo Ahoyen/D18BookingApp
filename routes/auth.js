@@ -161,9 +161,9 @@ router.get('/api/user/profile', async (req, res) => {
   });
 // PUT /api/auth/reset-password
 router.put('/api/auth/reset-password', async (req, res) => {
-    const { userEmail, newPassword, confirmPassword } = req.body;
+    const { userEmail, newPassword, confirmNewPassword } = req.body;
 
-    if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmNewPassword) {
         return res.status(400).json({ error: 'Passwords do not match' });
     }
 
