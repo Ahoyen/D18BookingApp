@@ -136,8 +136,7 @@ router.post('/api/auth/login', async (req, res) => {
     });
   }
 });
-
-
+// GET /api/user/profile
 router.get('/api/user/profile', async (req, res) => {
     try {
       // const sessionId = req.headers.cookie 
@@ -160,14 +159,15 @@ router.get('/api/user/profile', async (req, res) => {
       res.status(500).json({ success: false, error: 'Server error' });
     }
   });
-  router.put('/api/auth/reset-password', async (req, res) => {
-    const { email, newPassword, confirmPassword } = req.body;
+// PUT /api/auth/reset-password
+router.put('/api/auth/reset-password', async (req, res) => {
+    const { userEmail, newPassword, confirmPassword } = req.body;
 
     if (newPassword !== confirmPassword) {
         return res.status(400).json({ error: 'Passwords do not match' });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
         return res.status(404).json({ error: 'User not found' });
     }
