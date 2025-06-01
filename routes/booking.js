@@ -70,8 +70,14 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
 });
 
 // GET /api/user/booked-rooms
-router.get("/api/user/booked-rooms", verifySession, async (req, res) => {
-    const userId = req.user.id;
+router.get("/api/user/booked-rooms", async (req, res) => {
+    const sessionId = req.cookies.sessionId; 
+    const userId = parseInt(sessionId, 10);
+  
+    if (!userId) {
+      return res.status(401).json({ success: false, error: 'Unauthorized - missing session' });
+    }
+  
 
     try {
         const bookings = await Booking.find({ userId });
@@ -89,5 +95,36 @@ router.get("/api/user/booked-rooms", verifySession, async (req, res) => {
         return res.status(500).json({ success: false, error: err.message });
     }
 });
+// // GET /api/user/booked-rooms
+// router.get("/api/user/booked-rooms", verifySession, async (req, res) => {
+//     const userId = req.user.id;
+
+//     try {
+//         const bookings = await Booking.find({ userId });
+        
+//         const responseData = bookings.map(b => ({
+//             id: b.id,
+//             bookingDate: b.bookingDate,
+//             totalFee: b.totalFee,
+//             currencySymbol: b.currencySymbol,
+//             lastUpdated: b.lastUpdated
+//         }));
+
+//         return res.json({ success: true, data: responseData });
+//     } catch (err) {
+//         return res.status(500).json({ success: false, error: err.message });
+//     }
+// });
+
+// //Create them middlewares/verifySession.js
+// module.exports = function verifySession(req, res, next) {
+//     const sessionId = req.cookies.sessionId;
+//     if (!sessionId) {
+//         return res.status(401).json({ success: false, error: "Unauthorized - missing session" });
+//     }
+
+//     req.user = { id: parseInt(sessionId, 10) };
+//     next();
+// }
 
 module.exports = router;
