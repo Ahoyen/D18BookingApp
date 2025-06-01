@@ -1,0 +1,17 @@
+{
+    "Notifications": {
+        "1": {
+            "content": "Bạn đã có đơn đặt phòng mới!",
+            "timestamp": "2025-06-01T12:00:00"
+          },
+          "2": {
+            "content": "Ưu đãi tháng 6 cho bạn!",
+            "timestamp": "2025-06-01T13:30:00"
+          },
+          "3": {
+            "content": "Bạn đã có đơn đặt phòng mới!",
+            "timestamp": "2025-06-01T20:30:00"
+          }
+    }
+  }
+  
