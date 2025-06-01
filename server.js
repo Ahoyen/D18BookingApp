@@ -6,6 +6,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/category')
 const roomRoutes = require('./routes/room')
+const bookingRoutes = require('./routes/booking');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,9 @@ app.use(authRoutes);
 app.use(categoryRoutes)
 // Route room
 app.use(roomRoutes)
+// Route booking
+app.use(bookingRoutes)
+
 
 app.use(express.static('public'));
 
