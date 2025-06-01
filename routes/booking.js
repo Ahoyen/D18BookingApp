@@ -43,7 +43,7 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
       roomId,
       userId, 
       totalFee,
-      currencySymbol: "đ",
+      currencySymbol: "₫",
       lastUpdated: Math.floor(Date.now() / 1000),
       bookingReview: review ? review.comment : null,
       reviewRating: review ? review.reviewRating : null,
