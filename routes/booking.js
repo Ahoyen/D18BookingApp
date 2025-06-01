@@ -4,7 +4,7 @@ const Booking = require('../models/Booking');
 const Room = require('../models/Room');
 const Review = require('../models/Review');
 const User = require('../models/User');
-const { sendFCMNotification } = require('../service/fcmService');
+// const { sendFCMNotification } = require('../service/fcmService');
 
 
 router.get('/api/booking/:roomid/create', async (req, res) => {
@@ -55,11 +55,11 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
     });
 
     await booking.save();
-    const fcmToken = 'eOISu6_BTN65EsTckGEfmX:APA91bE4URxowvJ6_5iD0GF3od7joCTNNDfK2n6Mc74a_jmaFbLvhUGJL5gzRJ4q41f1fs042Yg7Hj2qBGedYnJ1xljed_iog0wXjG6WeZ76GjFyESxH5QM';
-    const message = 'Bạn đã có đơn đặt phòng mới!';
-    if (fcmToken) {
-      await sendFCMNotification(fcmToken, message);
-    }
+    // const fcmToken = 'eOISu6_BTN65EsTckGEfmX:APA91bE4URxowvJ6_5iD0GF3od7joCTNNDfK2n6Mc74a_jmaFbLvhUGJL5gzRJ4q41f1fs042Yg7Hj2qBGedYnJ1xljed_iog0wXjG6WeZ76GjFyESxH5QM';
+    // const message = 'Bạn đã có đơn đặt phòng mới!';
+    // if (fcmToken) {
+    //   await sendFCMNotification(fcmToken, message);
+    // }
 
     res.json({
       success: true,
