@@ -111,7 +111,7 @@ router.get("/api/user/booked-rooms", async (req, res) => {
   
       for (const b of bookings) {
         const room = await Room.findOne({ id: b.roomId });
-        const host = room ? await User.findOne({ id: room.hostId }) : null;
+        const host = room ? await User.findOne({ id: room.host}) : null;
   
         bookedRooms.push({
           bookingId: b.id,
