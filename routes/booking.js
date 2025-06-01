@@ -69,4 +69,25 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
   }
 });
 
+// GET /api/user/booked-rooms
+router.get("/api/user/booked-rooms", verifySession, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const bookings = await Booking.find({ userId });
+        
+        const responseData = bookings.map(b => ({
+            id: b.id,
+            bookingDate: b.bookingDate,
+            totalFee: b.totalFee,
+            currencySymbol: b.currencySymbol,
+            lastUpdated: b.lastUpdated
+        }));
+
+        return res.json({ success: true, data: responseData });
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 module.exports = router;
