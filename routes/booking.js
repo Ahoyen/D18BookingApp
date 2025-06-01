@@ -3,6 +3,8 @@ const router = express.Router();
 const Booking = require('../models/Booking');
 const Room = require('../models/Room');
 const Review = require('../models/Review');
+const User = require('../models/User');
+
 
 router.get('/api/booking/:roomid/create', async (req, res) => {
   const roomId = parseInt(req.params.roomid);
