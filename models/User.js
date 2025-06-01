@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   id: { type: Number, unique: true, required: true },    
   status: { type: Boolean, default: true },
-  createdDate: { type: Number, default: () => Date.now() }, // long (timestamp)
-  updatedDate: { type: Number, default: () => Date.now() }, // long (timestamp)
+  createdDate: { type: Number, default: () => Date.now() }, 
+  updatedDate: { type: Number, default: () => Date.now() }, 
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   sex: { type: String, enum: ['Male', 'Female', 'Other'] },
