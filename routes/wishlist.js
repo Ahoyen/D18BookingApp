@@ -60,6 +60,7 @@ router.put('/api/user/add-to-favoritelists/:id', async (req, res) => {
     if (!wishlist) {
       wishlist = new Wishlist({ userId: userId, roomIds: [] });
     }
+    const roomObjectId = mongoose.Types.ObjectId(roomId);
     if (!wishlist.roomIds.includes(roomId)) {
       wishlist.roomIds.push(roomId);
       await wishlist.save();
@@ -84,6 +85,7 @@ router.put('/api/user/remove-from-favoritelists/:id', async (req, res) => {
     if (!wishlist) {
       return res.status(404).json({ success: false, data: null, error: "Wishlist not found" });
     }
+    const roomObjectId = mongoose.Types.ObjectId(roomId);
     wishlist.roomIds = wishlist.roomIds.filter(id => id.toString() !== roomId);
     await wishlist.save();
     res.json({ success: true, data: "Removed successfully", error: null });
