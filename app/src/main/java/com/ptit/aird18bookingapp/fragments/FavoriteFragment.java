@@ -83,14 +83,18 @@ public class FavoriteFragment extends Fragment {
         @Override
         public void didFetch(WishlistResponseData response, String message) {
             dialog.dismiss();
+
             if (!response.data.isEmpty()) {
                 lvl_notfound.setVisibility(View.INVISIBLE);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                adapter = new WishlistAdapter(getContext(), response.data, wishlistClicksListener);
-                recyclerView.setAdapter(adapter);
             } else {
-                lvl_notfound.setVisibility(View.VISIBLE);            }
+                lvl_notfound.setVisibility(View.VISIBLE);
+            }
+
+            // Cập nhật RecyclerView, kể cả khi data rỗng
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+            adapter = new WishlistAdapter(getContext(), response.data, wishlistClicksListener);
+            recyclerView.setAdapter(adapter);
         }
 
         @Override
@@ -121,7 +125,6 @@ public class FavoriteFragment extends Fragment {
         @Override
         public void didFetch(WishlistResponse response, String message) {
             manager.getAllWishlists(wishlistListAllResponseListener, cookie);
-            adapter.notifyDataSetChanged();
             Toast.makeText(getActivity(), "Action " + response.data, Toast.LENGTH_LONG).show();
         }
 

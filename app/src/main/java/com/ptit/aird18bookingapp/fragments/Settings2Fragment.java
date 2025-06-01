@@ -2,6 +2,7 @@ package com.ptit.aird18bookingapp.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,6 +44,7 @@ import com.ptit.aird18bookingapp.activities.LoginActivity;
 import com.ptit.aird18bookingapp.activities.MainActivity;
 import com.ptit.aird18bookingapp.adapters.HistoryBookingAdapter;
 import com.ptit.aird18bookingapp.listeners.BookingResponseDetailListener;
+import com.ptit.aird18bookingapp.models.BookedRoom;
 import com.ptit.aird18bookingapp.models.BookingResponseDetail;
 import com.ptit.aird18bookingapp.repository.RequestManager;
 import com.ptit.aird18bookingapp.utils.Constants;
@@ -52,6 +54,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,6 +68,7 @@ import java.util.Locale;
 
         RequestManager manager;
         private PreferenceManager preferenceManager;
+        List<BookedRoom> bookingList = new ArrayList<>();
 
         String cookie;
 
@@ -140,7 +144,7 @@ import java.util.Locale;
                                 {Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         PackageManager.PERMISSION_GRANTED);
                 try {
-                    createInvoice1();
+                    createInvoice1(bookingList);
                     Toast.makeText(getContext(), "duoc", Toast.LENGTH_SHORT).show();
 
                 } catch (IOException e) {
@@ -241,7 +245,13 @@ import java.util.Locale;
         private final BookingResponseDetailListener bookingResponseDetailListener = new BookingResponseDetailListener() {
             @Override
             public void didFetch(BookingResponseDetail response, String message) {
+                if (response != null && response.data.bookedRooms != null) {
+                    bookingList.clear();
+                    bookingList.addAll(response.data.bookedRooms);
 
+                } else {
+                    Toast.makeText(getContext(), "Không có dữ liệu lịch sử đặt phòng", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -249,120 +259,141 @@ import java.util.Locale;
                 //Toast.makeText(BookedActivity.this, message, Toast.LENGTH_LONG).show();
             }
         };
-        //private void createInvoice1(List<TableData> list, PhieuNhap phieuNhap, Kho kho) throws IOException {
-        private void createInvoice1() throws IOException {
+        private void createInvoice1(List<BookedRoom> bookingList) throws IOException {
             int pageWidth = 1200;
-            Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
-            Bitmap bmpScale = Bitmap.createScaledBitmap(bmp, 1200, 518, false);
+            int pageHeight = 2010;
 
-            PdfDocument myPdfDocument = new PdfDocument();
+            Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
+            Bitmap bmpScale = Bitmap.createScaledBitmap(bmp, pageWidth, 518, false);
+
+            PdfDocument pdfDocument = new PdfDocument();
             Paint paint = new Paint();
             Paint titlePaint = new Paint();
+            Paint tablePaint = new Paint();
 
-            PdfDocument.PageInfo myPageInfo = new PdfDocument.PageInfo.Builder(1200, 2010, 1).create();
-            PdfDocument.Page myPage1 = myPdfDocument.startPage(myPageInfo);
-            Canvas canvas = myPage1.getCanvas();
+            int yStart = 600;
+            int rowHeight = 60;
+            int pageNumber = 1;
+            PdfDocument.Page currentPage = null;
+            Canvas canvas = null;
 
-            canvas.drawBitmap(bmpScale,0,0,paint);
+            int totalAmount = 0;
+            int y = yStart;
 
-            titlePaint.setTextAlign(Paint.Align.CENTER);
-            titlePaint.setColor(Color.BLACK);
-            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            titlePaint.setTextSize(90);
-            canvas.drawText("Invoice booking", pageWidth / 2, 600, titlePaint);
+            for (int i = 0; i < bookingList.size(); i++) {
+                BookedRoom room = bookingList.get(i);
+                if (currentPage == null || y + rowHeight > pageHeight) {
+                    if (currentPage != null) {
+                        pdfDocument.finishPage(currentPage);
+                    }
 
-            titlePaint.setTextAlign(Paint.Align.LEFT);
-            titlePaint.setColor(Color.GRAY);
-            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-            titlePaint.setTextSize(35);
-            canvas.drawText("Mã kho: " , 50, 350, titlePaint);
-            canvas.drawText("Tên kho: ", 700, 350, titlePaint);
-            canvas.drawText("Số phiếu nhập: " , 50, 420, titlePaint);
-            canvas.drawText("Ngày lập phiếu: " , 700, 420, titlePaint);
+                    PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageNumber++).create();
+                    currentPage = pdfDocument.startPage(pageInfo);
+                    canvas = currentPage.getCanvas();
+                    drawHeader(canvas, bmpScale, paint, titlePaint, tablePaint, pageWidth, yStart);
+                    y = yStart + 80 + 40; //khoảng cách giữa header và dòng dữ liệu
+                }
 
-//
+                int rowTotal = (int)(room.numberOfDays * room.pricePerDay);
+                totalAmount += rowTotal;
 
-            //main
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(5);
-            paint.setTextSize(35);
-            canvas.drawRect(20, 760, pageWidth - 20, 860, paint);
+                // Vẽ nội dung dòng
+                paint.setTextSize(35);
+                paint.setTextAlign(Paint.Align.LEFT);
+                paint.setColor(Color.BLACK);
+                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
 
-            paint.setColor(Color.BLACK);
-            paint.setStyle(Paint.Style.FILL);
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText("STT", 40, 830, paint);
-            canvas.drawText("Mã VT", 130, 830, paint);
-            canvas.drawText("Tên vật tư", 290, 830, paint);
-            canvas.drawText("Xuất xứ", 610, 830, paint);
-            canvas.drawText("ĐVT", 880, 830, paint);
-            canvas.drawText("Số lượng", 1030, 830, paint);
+                canvas.drawText(String.valueOf(i + 1), 40, y, paint);
+                canvas.drawText(room.roomName, 130, y, paint);
+                canvas.drawText(room.checkinDate, 430, y, paint);
+                canvas.drawText(room.checkoutDate, 630, y, paint);
+                canvas.drawText(String.valueOf(room.numberOfDays), 830, y, paint);
+                canvas.drawText(String.valueOf(room.pricePerDay), 930, y, paint);
+                canvas.drawText(String.valueOf(rowTotal), 1080, y, paint);
+                y += rowHeight;
+            }
 
-            canvas.drawLine(110, 790, 110, 840, paint);
-            canvas.drawLine(260, 790, 260, 840, paint);
-            canvas.drawLine(580, 790, 580, 840, paint);
-            canvas.drawLine(840, 790, 840, 840, paint);
-            canvas.drawLine(1020, 790, 1020, 840, paint);
+            if (currentPage != null) {
+                paint.setColor(Color.BLACK);
+                paint.setTextSize(45);
+                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+                canvas.drawLine(700, y + 20, pageWidth - 20, y + 20, paint);
+                canvas.drawText("Tổng tiền:", 700, y + 90, paint);
+                paint.setTextAlign(Paint.Align.RIGHT);
+                canvas.drawText(totalAmount + " VND", pageWidth - 30, y + 90, paint);
+                paint.setTextAlign(Paint.Align.LEFT);
+                canvas.drawText("Tổng số đơn: " + bookingList.size(), 700, y + 160, paint);
+                pdfDocument.finishPage(currentPage);
+            }
 
-            int offsetY = 950;
-            int total = 0;
-
-
-//        for (int i = 0; i < list.size(); i++) {
-//            TableData t = list.get(i);
-//            int tt = i + 1;
-//            canvas.drawText(tt + "", 40, offsetY, paint);
-//            canvas.drawText("", 130, offsetY, paint);//t.maVT
-//            canvas.drawText("", 290, offsetY, paint);//t.tenVT
-//            canvas.drawText("g", 610, offsetY, paint);//t.xuatXu
-//            canvas.drawText("", 880, offsetY, paint);//t.DVT
-//            canvas.drawText(  "fgd", 1030, offsetY, paint);//t.soLuong
-//            offsetY = offsetY + 60;
-//            total += 1;//t.soLuong
-//        }
-
-            canvas.drawLine(680, offsetY + 80, pageWidth - 20, offsetY + 80, paint);
-
-            paint.setColor(Color.BLACK);
-            paint.setTextSize(50);
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText("Tổng số lượng:", 700, offsetY + 150, paint);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(total + "", pageWidth - 20, offsetY + 150, paint);
-
-            paint.setColor(Color.BLACK);
-            paint.setTextSize(50);
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText("Số loại vật tư:", 700, offsetY + 220, paint);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(10 + "", pageWidth - 20, offsetY + 220, paint);
-
-            myPdfDocument.finishPage(myPage1);
-
-            String folder = Environment.getExternalStorageDirectory().getPath() + "/documents";
-            File folderFile = new File(folder);
+            // Lưu file PDF
+            String folderPath = Environment.getExternalStorageDirectory().getPath() + "/documents";
+            File folderFile = new File(folderPath);
             if (!folderFile.exists()) {
                 folderFile.mkdirs();
             }
-            String path = folder + "/Calcuradora_" + System.currentTimeMillis() + ".pdf";
-            File myFile = new File(path);
-            FileOutputStream fOut = new FileOutputStream(myFile);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myPdfDocument.writeTo(fOut);
-            myPdfDocument.close();
-            myOutWriter.close();
-            fOut.close();
-            Toast.makeText(getContext(), "File Saved on " + path, Toast.LENGTH_LONG).show();
-            openPdfViewer(myFile);
+            String filePath = folderPath + "/BookingInvoice_" + System.currentTimeMillis() + ".pdf";
+            File file = new File(filePath);
+            FileOutputStream fos = new FileOutputStream(file);
+            pdfDocument.writeTo(fos);
+            pdfDocument.close();
+            fos.close();
 
+            Toast.makeText(getContext(), "Đã lưu file: " + filePath, Toast.LENGTH_LONG).show();
+            openPdfViewer(file);
         }
-        private void openPdfViewer(File file) { //need to add provider in manifest and filepaths.xml
+        private void drawHeader(Canvas canvas, Bitmap bmpScale, Paint paint, Paint titlePaint, Paint tablePaint, int pageWidth, int yStart) {
+            // Vẽ logo
+            canvas.drawBitmap(bmpScale, 0, 0, paint);
+
+            // Tiêu đề
+            titlePaint.setTextAlign(Paint.Align.CENTER);
+            titlePaint.setColor(Color.BLACK);
+            titlePaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+            titlePaint.setTextSize(70);
+            canvas.drawText("LỊCH SỬ ĐẶT PHÒNG", pageWidth / 2, 580, titlePaint);
+
+            // Vẽ bảng header
+            tablePaint.setStyle(Paint.Style.STROKE);
+            tablePaint.setStrokeWidth(3);
+            tablePaint.setColor(Color.BLACK);
+            canvas.drawRect(20, yStart, pageWidth - 20, yStart + 80, tablePaint);
+
+            tablePaint.setStyle(Paint.Style.FILL);
+            tablePaint.setTextSize(35);
+            tablePaint.setColor(Color.BLACK);
+
+            canvas.drawText("STT", 40, yStart + 55, tablePaint);
+            canvas.drawText("Tên phòng", 130, yStart + 55, tablePaint);
+            canvas.drawText("Check-in", 430, yStart + 55, tablePaint);
+            canvas.drawText("Check-out", 630, yStart + 55, tablePaint);
+            canvas.drawText("Ngày", 830, yStart + 55, tablePaint);
+            canvas.drawText("Giá/ngày", 930, yStart + 55, tablePaint);
+            canvas.drawText("Tổng", 1080, yStart + 55, tablePaint);
+
+            // Các đường kẻ dọc
+            canvas.drawLine(110, yStart, 110, yStart + 80, tablePaint);
+            canvas.drawLine(410, yStart, 410, yStart + 80, tablePaint);
+            canvas.drawLine(610, yStart, 610, yStart + 80, tablePaint);
+            canvas.drawLine(810, yStart, 810, yStart + 80, tablePaint);
+            canvas.drawLine(910, yStart, 910, yStart + 80, tablePaint);
+            canvas.drawLine(1060, yStart, 1060, yStart + 80, tablePaint);
+        }
+
+        private void openPdfViewer(File file) {
+            Uri uri = FileProvider.getUriForFile(getContext(),
+                    "com.ptit.aird18bookingapp.fileprovider", file);
+
             Intent intent = new Intent(Intent.ACTION_VIEW);
-//        intent.setDataAndType(FileProvider.getUriForFile(getContext(),
-//                BuildConfig.APPLICATION_ID + ".provider", file), "application/pdf");
+            intent.setDataAndType(uri, "application/pdf");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivityForResult(intent, 101);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(getContext(), "Không tìm thấy ứng dụng để mở file PDF", Toast.LENGTH_LONG).show();
+            }
 
         }
-
     }

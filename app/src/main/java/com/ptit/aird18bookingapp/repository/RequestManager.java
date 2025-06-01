@@ -11,6 +11,7 @@ import com.ptit.aird18bookingapp.listeners.PasswordResponseListener;
 import com.ptit.aird18bookingapp.listeners.RegisterResponseListener;
 import com.ptit.aird18bookingapp.listeners.RoomDetailResponseListener;
 import com.ptit.aird18bookingapp.listeners.RoomResponseListener;
+import com.ptit.aird18bookingapp.listeners.UserProfileResponseListener;
 import com.ptit.aird18bookingapp.listeners.WishlistEventResponseListener;
 import com.ptit.aird18bookingapp.listeners.WishlistListAllResponseListener;
 import com.ptit.aird18bookingapp.listeners.WishlistListResponseListener;
@@ -382,6 +383,25 @@ public class RequestManager {
             }
         });
     }
+    public void getUserProfile(UserProfileResponseListener listener, String cookie) {
+        CallUserProfile callUserProfile = retrofit.create(CallUserProfile.class);
+        Call<UserResponse> call = callUserProfile.getUserProfile(cookie);
+        call.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (!response.isSuccessful()) {
+                    listener.didError(response.message());
+                    return;
+                }
+                listener.didFetch(response.body(), response.message());
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                listener.didError(t.getMessage());
+            }
+        });
+    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     private interface CallBookingDetail {
@@ -450,7 +470,7 @@ public class RequestManager {
     }
 
     private interface CallRoomDetail {
-        @GET("/api/room/{id}")
+        @GET("/api/rooms/{id}")
         Call<RoomDetailResponse> roomDetailResponseCall(@Path("id") int id);
     }
 
@@ -465,4 +485,9 @@ public class RequestManager {
                                                   @Header("Cookie") String cookie);
     }
 
+    private interface CallUserProfile {
+        @Headers({"Content-Type: application/json"})
+        @GET("/api/user/profile")
+        Call<UserResponse> getUserProfile(@Header("Cookie") String cookie);
+    }
 }

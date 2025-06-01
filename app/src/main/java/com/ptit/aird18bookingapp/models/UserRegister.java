@@ -8,8 +8,9 @@ public class UserRegister {
     public String password;
     public String sex;
     public String birthday;
+    public String avatarPath;
 
-    public UserRegister(String firstName, String lastName, String phoneNumber, String email, String password, String sex, String birthday) {
+    public UserRegister(String firstName, String lastName, String phoneNumber, String email, String password, String sex, String birthday, String avatarPath) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -17,5 +18,6 @@ public class UserRegister {
         this.password = password;
         this.sex = sex;
         this.birthday = birthday;
+        this.avatarPath = avatarPath;
     }
 }

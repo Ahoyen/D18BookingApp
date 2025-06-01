@@ -1,6 +1,7 @@
 package com.ptit.aird18bookingapp.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,7 +41,7 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull WishlistViewHolder holder, int position) {
-        Picasso.get().load(Constants.BASE_URL + list.get(position).images.get(0)).placeholder(R.drawable.playholder).into(holder.imageView);
+        Picasso.get().load(Constants.BASE_URL + list.get(position).images).placeholder(R.drawable.playholder).into(holder.imageView);
 
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +63,28 @@ public class WishlistAdapter extends RecyclerView.Adapter<WishlistViewHolder> {
     public int getItemCount() {
         return list.size();
     }
+
+    public void removeItemById(int id) {
+        if (list == null) {
+            Log.e("WishlistAdapter", "List is null");
+            return;
+        }
+        int position = -1;
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).id == id) {
+                position = i;
+                break;
+            }
+        }
+        if (position != -1) {
+            list.remove(position);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, list.size());
+        } else {
+            Log.e("WishlistAdapter", "Item id " + id + " not found in list");
+        }
+    }
+
 }
 
 class WishlistViewHolder extends RecyclerView.ViewHolder {

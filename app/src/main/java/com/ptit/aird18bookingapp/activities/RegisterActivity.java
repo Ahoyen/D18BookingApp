@@ -183,7 +183,8 @@ public class RegisterActivity extends AppCompatActivity {
                     inputEmail.getText().toString().trim(),
                     inputPassword.getText().toString().trim(),
                     items[itemSelected].toUpperCase(),
-                    inputBirthday.getText().toString()
+                    inputBirthday.getText().toString(),
+                    encodedImage
             ));
         }
 

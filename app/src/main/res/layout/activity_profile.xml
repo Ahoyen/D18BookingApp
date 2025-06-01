@@ -10,7 +10,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/linear">
 
-
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -92,6 +91,7 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
         <ImageView
             android:id="@+id/profile_back"
             android:layout_width="wrap_content"
@@ -124,8 +124,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#0000"
-                android:gravity="left"
-                android:maxLength="12"
+                android:gravity="start"
                 android:padding="16dp"
                 android:text="Tên"
                 android:textColor="#a2a1b8"
@@ -137,12 +136,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="#0000"
-                android:gravity="right"
+                android:gravity="end"
                 android:hint="Jnginah"
-                android:maxLength="12"
                 android:padding="16dp"
+                android:textColor="#181737"
                 android:textColorHint="#181737"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <LinearLayout
@@ -152,12 +153,11 @@
 
             <TextView
                 android:id="@+id/usrusr"
-                android:layout_width="9dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#0000"
-                android:gravity="left"
-                android:maxLength="15"
+                android:gravity="start"
                 android:padding="16dp"
                 android:text="Tên người dùng"
                 android:textColor="#a2a1b8"
@@ -169,13 +169,14 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="#0000"
-                android:gravity="right"
+                android:gravity="end"
                 android:hint="inewsyuzinh"
-                android:maxLength="12"
                 android:padding="16dp"
                 android:textColor="#181737"
                 android:textColorHint="#181737"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <View
@@ -194,8 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#0000"
-                android:gravity="left"
-                android:maxLength="12"
+                android:gravity="start"
                 android:padding="16dp"
                 android:text="Email"
                 android:textColor="#a2a1b8"
@@ -207,15 +207,15 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="#0000"
-                android:gravity="right"
+                android:gravity="end"
                 android:hint="inewsyuzinh@gmail.com"
-                android:maxLength="12"
                 android:padding="16dp"
                 android:textColor="#181737"
                 android:textColorHint="#1b193b"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
-        />
 
         <View
             android:layout_width="match_parent"
@@ -233,8 +233,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#0000"
-                android:gravity="left"
-                android:maxLength="12"
+                android:gravity="start"
                 android:padding="16dp"
                 android:text="Thông tin"
                 android:textColor="#a2a1b8"
@@ -246,12 +245,13 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="#0000"
-                android:gravity="right"
-                android:maxLength="12"
+                android:gravity="end"
                 android:padding="16dp"
                 android:textColor="#181737"
                 android:textColorHint="#1b193b"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:maxLines="1"
+                android:ellipsize="end" />
         </LinearLayout>
 
         <View
@@ -270,13 +270,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="#0000"
-                android:gravity="left"
-                android:maxLength="12"
+                android:gravity="start"
                 android:padding="16dp"
                 android:text="Đăng xuất"
                 android:textColor="#a2a1b8"
                 android:textSize="16dp" />
-            <!--com.rey.material.widget.Switch!-->
+
             <ImageButton
                 android:id="@+id/profile_signout"
                 android:layout_width="0dp"
@@ -284,14 +283,12 @@
                 android:layout_weight="2"
                 android:gravity="left"
                 android:padding="16dp"
-                android:src="@drawable/ic_logout"
-                android:text="" />
+                android:src="@drawable/ic_logout" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#dad8d8" />
-
     </LinearLayout>
 </RelativeLayout>

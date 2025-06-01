@@ -23,6 +23,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ptit.aird18bookingapp.R;
+import com.ptit.aird18bookingapp.listeners.UserProfileResponseListener;
+import com.ptit.aird18bookingapp.models.User;
+import com.ptit.aird18bookingapp.models.UserResponse;
+import com.ptit.aird18bookingapp.repository.IService;
+import com.ptit.aird18bookingapp.repository.RequestManager;
 import com.ptit.aird18bookingapp.utils.Constants;
 import com.ptit.aird18bookingapp.utils.PreferenceManager;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -31,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
+
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -42,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
     LinearLayout linear;
 
     private PreferenceManager preferenceManager;
+    private RequestManager requestManager;
     Animation anim_from_button, anim_from_top, anim_from_left;
 
     private String encodedImage;
@@ -52,9 +59,11 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
 
         preferenceManager = new PreferenceManager(ProfileActivity.this);
+        requestManager = new RequestManager(this);
+
         getViews();
 
-        loadUserDetails();
+        loadUserProfile();
 
         setListeners();
 
@@ -139,17 +148,47 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
-    private void loadUserDetails() {
-        profile_email.setText(preferenceManager.getString(Constants.KEY_EMAIL));
-        profile_username.setText(preferenceManager.getString(Constants.KEY_NAME));
-        profile_name.setText(preferenceManager.getString(Constants.KEY_NAME));
-        if (preferenceManager.getString(Constants.KEY_IMAGE) != null) {
-            profile_name.setText(preferenceManager.getString(Constants.KEY_NAME));
-            byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            profile_image.setImageBitmap(bitmap);
+//    private void loadUserDetails() {
+//        profile_email.setText(preferenceManager.getString(Constants.KEY_EMAIL));
+//        profile_username.setText(preferenceManager.getString(Constants.KEY_NAME));
+//        profile_name.setText(preferenceManager.getString(Constants.KEY_NAME));
+//        if (preferenceManager.getString(Constants.KEY_IMAGE) != null) {
+//            profile_name.setText(preferenceManager.getString(Constants.KEY_NAME));
+//            byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
+//            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//            profile_image.setImageBitmap(bitmap);
+//        }
+//    }
+
+
+    private void loadUserProfile() {
+        String cookie = preferenceManager.getString(Constants.KEY_COOKIE);
+        if (cookie == null) {
+            showToast("Cookie not found");
+            return;
         }
+
+        requestManager.getUserProfile(new UserProfileResponseListener() {
+            @Override
+            public void didFetch(UserResponse response, String message) {
+                User user = response.data;
+                profile_name.setText(user.getName());
+                profile_email.setText(user.getEmail());
+
+                if (user.getAvatarPath() != null) {
+                    byte[] bytes = Base64.decode(user.getAvatarPath(), Base64.DEFAULT);
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    profile_image.setImageBitmap(bitmap);
+                }
+            }
+
+            @Override
+            public void didError(String message) {
+                showToast("Failed to load profile: " + message);
+            }
+        }, cookie);
     }
+
 
     private void signOut() {
         showToast("Signing out ...");

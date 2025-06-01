@@ -6,7 +6,9 @@ import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import android.Manifest;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -16,6 +18,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -193,12 +196,28 @@ public class BookedActivity extends AppCompatActivity {
     }
 
 
-    private void openPdfViewer(File file) { //need to add provider in manifest and filepaths.xml
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-//        intent.setDataAndType(FileProvider.getUriForFile(getApplicationContext(),
-//                BuildConfig.APPLICATION_ID + ".provider", file), "application/pdf");
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(intent, 101);
+//    private void openPdfViewer(File file) { //need to add provider in manifest and filepaths.xml
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+////        intent.setDataAndType(FileProvider.getUriForFile(getApplicationContext(),
+////                BuildConfig.APPLICATION_ID + ".provider", file), "application/pdf");
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        startActivityForResult(intent, 101);
+//
+//    }
+private void openPdfViewer(File file) {
+    Uri uri = FileProvider.getUriForFile(getApplicationContext(),
+            "com.ptit.aird18bookingapp.fileprovider", file);
 
+    Intent intent = new Intent(Intent.ACTION_VIEW);
+    intent.setDataAndType(uri, "application/pdf");
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+    try {
+        startActivity(intent);
+    } catch (ActivityNotFoundException e) {
+        Toast.makeText(this, "Không tìm thấy ứng dụng để mở file PDF", Toast.LENGTH_LONG).show();
     }
+}
+
 }

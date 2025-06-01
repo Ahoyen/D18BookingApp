@@ -1,8 +1,13 @@
 package com.ptit.aird18bookingapp.fragments;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -57,127 +62,27 @@ import retrofit2.Response;
 
 public class NotificationFragment extends Fragment {
 
-    private PostAdapter _mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
+    private PostAdapter postAdapter;
+    private RecyclerView recyclerView;
+    private LinearLayout layoutNotFound;
     private PreferenceManager preferenceManager;
-    RecyclerView recyclerView;
-    LinearLayout lvl_not_found_notification;
+    private String lastShownNotification = null;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_notification, container, false);
-        FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
-        firebaseMessaging.subscribeToTopic("");
 
         preferenceManager = new PreferenceManager(getContext());
-        layoutManager = new LinearLayoutManager(getContext());
-        getViews(view);
+        recyclerView = view.findViewById(R.id.recycle_notification_list);
+        layoutNotFound = view.findViewById(R.id.lvl_notfound_notification);
 
-        recyclerView.setFocusable(false);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(layoutManager);
 
         getToken();
-
-        getDataHistoryNotification();
+        loadNotifications();
 
         return view;
-    }
-
-    private void getDataHistoryNotification() {
-
-        DatabaseReference fallDetector = FirebaseDatabase
-                .getInstance("https://airj18-booking-app-default-rtdb.asia-southeast1.firebasedatabase.app/")
-                .getReference("Notifications");
-        Query fallDetectQuery = fallDetector.orderByKey();
-        fallDetectQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<Notification> notifications = new ArrayList<>();
-
-
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    notifications.add(postSnapshot.getValue(Notification.class));
-                }
-
-                Collections.reverse(notifications);
-
-                if (notifications.isEmpty()) {
-                    lvl_not_found_notification.setVisibility(View.VISIBLE);
-                } else {
-                    lvl_not_found_notification.setVisibility(View.GONE);
-                }
-
-                _mAdapter = new PostAdapter(notifications);
-                recyclerView.setAdapter(_mAdapter);
-
-                Log.d("token", preferenceManager.getString(Constants.KEY_FCM_TOKEN));
-
-                try {
-                    JSONArray tokens = new JSONArray();
-                    tokens.put(preferenceManager.getString(Constants.KEY_FCM_TOKEN));
-
-                    JSONObject data = new JSONObject();
-                    data.put(Constants.KEY_MESSAGE, notifications.get(0).content);
-
-                    JSONObject body = new JSONObject();
-                    body.put(Constants.REMOTE_MSG_DATA, data);
-                    body.put(Constants.REMOTE_MSG_REGISTRATION_IDS, tokens);
-
-                    System.out.println(body.toString());
-
-                    sendNotification(body.toString());
-
-                } catch (Exception e) {
-                    showToast(e.getMessage());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private void sendNotification(String messageBody) {
-        ApiClient.getClient().create(ApiService.class).sendMessage(
-                Constants.getRemoteMsgHeaders(),
-                messageBody
-        ).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if (response.isSuccessful()) {
-                    try {
-                        if (response.body() != null) {
-                            JSONObject responseJson = new JSONObject(response.body());
-                            JSONArray results = responseJson.getJSONArray("results");
-                            if (responseJson.getInt("failure") == 1) {
-                                JSONObject error = (JSONObject) results.get(0);
-                                showToast(error.getString("error"));
-                                return;
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                    showToast("Notification sent successfully!");
-                } else {
-                    showToast("Error: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                showToast(t.getMessage());
-            }
-        });
-    }
-
-    private void showToast(String message) {
-        //Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
     }
 
     private void getToken() {
@@ -188,10 +93,71 @@ public class NotificationFragment extends Fragment {
         preferenceManager.putString(Constants.KEY_FCM_TOKEN, token);
     }
 
-    private void getViews(View view) {
-        recyclerView = view.findViewById(R.id.recycle_notification_list);
-        lvl_not_found_notification = view.findViewById(R.id.lvl_notfound_notification);
+    private void loadNotifications() {
+        DatabaseReference notificationsRef = FirebaseDatabase
+                .getInstance("https://aird18bookingapp-default-rtdb.asia-southeast1.firebasedatabase.app/")
+                .getReference("Notifications");
+
+        notificationsRef.orderByKey().addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<Notification> notifications = new ArrayList<>();
+
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Notification notification = snapshot.getValue(Notification.class);
+                    if (notification != null) {
+                        notifications.add(notification);
+                    }
+                }
+
+                Collections.reverse(notifications);
+
+                if (notifications.isEmpty()) {
+                    layoutNotFound.setVisibility(View.VISIBLE);
+                } else {
+                    layoutNotFound.setVisibility(View.GONE);
+                    postAdapter = new PostAdapter(notifications);
+                    recyclerView.setAdapter(postAdapter);
+
+                    Notification latest = notifications.get(0);
+                    if (latest.content != null && (lastShownNotification == null || !lastShownNotification.equals(latest.content))) {
+                        showSystemNotification(latest.content);
+                        lastShownNotification = latest.content;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e("NotificationFragment", "Database error: " + error.getMessage());
+            }
+        });
     }
 
+    private void showSystemNotification(String message) {
+        Context context = requireContext();
+        String channelId = "notify_message";
 
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Thông báo",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Kênh thông báo từ Firebase Database");
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
+                .setSmallIcon(R.drawable.logo) // ensure this icon exists
+                .setContentTitle("AirD18 Booking")
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
 }
+

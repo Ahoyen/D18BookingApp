@@ -48,8 +48,8 @@ public class OTPActivity extends AppCompatActivity {
         setEvent();
     }
     private void sendOTP() {
-        final String username="nhanhuu2808@gmail.com";
-        final String password="Nhan2808";
+        final String username="pc2000it@gmail.com";
+        final String password="wudo xvqm nmno yehy";
         String messageToSend="Mã OTP Đặt phòng:"+ randomOTP;
         Properties properties=new Properties();
         properties.put("mail.smtp.auth","true");
@@ -72,7 +72,9 @@ public class OTPActivity extends AppCompatActivity {
             Transport.send(message);
             Toast.makeText(this,"Send Email successfully",Toast.LENGTH_LONG).show();
         }catch (MessagingException e){
-            throw  new RuntimeException(e);
+//            throw  new RuntimeException(e);
+            e.printStackTrace();
+            Toast.makeText(this, "Gửi email thất bại: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
     }

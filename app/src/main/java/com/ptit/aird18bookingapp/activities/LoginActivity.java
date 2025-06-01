@@ -212,9 +212,10 @@ private final LoginResponseListener loginResponseListener = new LoginResponseLis
         if (userResponse != null && userResponse.error == null && userResponse.data != null) {
             preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
             preferenceManager.putString(Constants.KEY_USER_ID, userResponse.data.id + "");
-            preferenceManager.putString(Constants.KEY_NAME, userResponse.data.fullName);
+            preferenceManager.putString(Constants.KEY_NAME, userResponse.data.getName());
             preferenceManager.putString(Constants.KEY_COOKIE, cookie);
-            preferenceManager.putString(Constants.KEY_EMAIL, userResponse.data.email);
+            preferenceManager.putString(Constants.KEY_EMAIL, userResponse.data.getEmail());
+            preferenceManager.putString(Constants.KEY_IMAGE, userResponse.data.getAvatarPath());
 
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

@@ -261,19 +261,20 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadUserDetails() {
-        System.out.println(preferenceManager.getString(Constants.KEY_IMAGE));
-
-        if (preferenceManager.getString(Constants.KEY_IMAGE) != null) {
-            byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            imageProfile.setImageBitmap(bitmap);
-        }
-
-        imageProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getActivity(), ProfileActivity.class));
+        String base64Image = preferenceManager.getString(Constants.KEY_IMAGE);
+        if (base64Image != null && !base64Image.isEmpty()) {
+            try {
+                byte[] bytes = Base64.decode(base64Image, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                if (bitmap != null) {
+                    imageProfile.setImageBitmap(bitmap);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
             }
+        }
+        imageProfile.setOnClickListener(v -> {
+            startActivity(new Intent(getActivity(), ProfileActivity.class));
         });
     }
 

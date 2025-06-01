@@ -7,6 +7,7 @@ import com.ptit.aird18bookingapp.models.Response.BookingResponse;
 import com.ptit.aird18bookingapp.models.Response.PasswordResponse;
 import com.ptit.aird18bookingapp.models.RoomDetailResponse;
 import com.ptit.aird18bookingapp.models.RoomResponse;
+import com.ptit.aird18bookingapp.models.User;
 import com.ptit.aird18bookingapp.models.UserLogin;
 import com.ptit.aird18bookingapp.models.UserRegister;
 import com.ptit.aird18bookingapp.models.UserResponse;
@@ -100,4 +101,8 @@ public interface IService {
                                               @Query("numberOfDays") int numberOfDays,
                                               @Query("clientMessage") String clientMessage,
                                               @Header("Cookie") String cookie);
+
+    @Headers({"Content-Type: application/json"})
+    @GET("/api/user/{id}")
+    Call<User> getUserProfile(@Path("id") int userId);
 }

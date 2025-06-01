@@ -4,6 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -14,7 +20,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.ptit.aird18bookingapp.R;
 import com.ptit.aird18bookingapp.adapters.PostAdapter;
 import com.ptit.aird18bookingapp.fragments.FavoriteFragment;
@@ -59,8 +67,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        FirebaseMessaging.getInstance().getToken()
+//                .addOnCompleteListener(task -> {
+//                    if (!task.isSuccessful()) {
+//                        Log.w("FCM", "Fetching FCM registration token failed", task.getException());
+//                        return;
+//                    }
+//
+//                    // Lấy token thành công
+//                    String token = task.getResult();
+//                    Log.d("FCM", "Current token: " + token);
+//                    Toast.makeText(this, "Token: " + token, Toast.LENGTH_LONG).show();
+//                });
 //        PreferenceManager preferenceManager = new PreferenceManager(getApplicationContext());
 //        preferenceManager.clear();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
         if(LocaleList.getDefault().get(0).getLanguage().equals("en")){
             mLocale=new Locale("en");
         }else {
@@ -138,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
 
 
