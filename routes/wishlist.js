@@ -65,19 +65,24 @@ router.put('/api/user/add-to-favoritelists/:id', async (req, res) => {
     if (isNaN(roomId)) {
       return res.status(400).json({ success: false, error: 'Invalid room ID' });
     }
-
+    console.log(`[DEBUG] User ${userId} adding room ${roomId} to wishlist`);
     let wishlist = await Wishlist.findOne({ userId });
     if (!wishlist) {
+      console.log('[DEBUG] Wishlist not found, creating new');
       wishlist = new Wishlist({ userId, roomIds: [] });
     }
 
     if (!wishlist.roomIds.includes(roomId)) {
       wishlist.roomIds.push(roomId);
       await wishlist.save();
+      console.log('[DEBUG] Room added successfully');
+    }else {
+      console.log('[DEBUG] Room already in wishlist');
     }
 
     res.json({ success: true, data: "Added successfully", error: null });
   } catch (error) {
+    console.error('[ERROR]', error);
     res.status(500).json({ success: false, data: null, error: error.message });
   }
 });
