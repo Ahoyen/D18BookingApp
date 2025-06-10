@@ -82,7 +82,7 @@ public class HomeFragment extends Fragment {
         loadUserDetails();
 
 //        manager = new RequestManager(getContext());
-        service.getCategories(categoryResponseListener);
+//        service.getCategories(categoryResponseListener);
         service.getWishlists(wishlistListResponseListener, cookie);
 
 
@@ -178,6 +178,8 @@ public class HomeFragment extends Fragment {
         public void didFetch(CategoryResponse response, String message) {
 
             List<Category> categories = response.data;
+            tabLayout.removeAllTabs();
+
             for (Category category : categories
             ) {
                 tabLayout.addTab(tabLayout.newTab().setText(category.name));

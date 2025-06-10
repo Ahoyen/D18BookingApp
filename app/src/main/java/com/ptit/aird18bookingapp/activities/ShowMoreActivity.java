@@ -32,7 +32,7 @@ public class ShowMoreActivity extends AppCompatActivity {
 
 
     ImageView down_arrow, header_background;
-    TextView third_title, third_rating_number,about_text,type_of_view_text,venue_type_text;
+    TextView third_title, third_rating_number,about_text,type_of_view_text,venue_type_text,price_text;
     Button roadmap_button;
 
     LinearLayout btnBooking;
@@ -64,6 +64,7 @@ public class ShowMoreActivity extends AppCompatActivity {
         btnBooking = findViewById(R.id.btnBooking);
         type_of_view_text = findViewById(R.id.type_of_view_text);
         venue_type_text = findViewById(R.id.venue_type_text);
+        price_text = findViewById(R.id.price_text);
 
         Picasso.get().load(Constants.BASE_URL + roomDetail.thumbnail).into(header_background);
         third_title.setText(roomDetail.name);
@@ -71,6 +72,8 @@ public class ShowMoreActivity extends AppCompatActivity {
         about_text.setText(roomDetail.description);
         type_of_view_text.setText(roomDetail.location);
         venue_type_text.setText(roomDetail.stayType);
+        price_text.setText(roomDetail.price + " VNĐ");
+
         Log.d("DEBUG", "Location: " + roomDetail.location);
 
         from_bottom = AnimationUtils.loadAnimation(this, R.anim.anim_from_bottom);
