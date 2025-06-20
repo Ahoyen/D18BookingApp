@@ -61,6 +61,8 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
     //   await sendFCMNotification(fcmToken, message);
     // }
 
+    const user = await User.findOne({ id: userId });
+
     res.json({
       success: true,
       data: {
@@ -68,7 +70,10 @@ router.get('/api/booking/:roomid/create', async (req, res) => {
         bookingDate: booking.bookingDate,
         currencySymbol: booking.currencySymbol,
         totalFee: booking.totalFee,
-        lastUpdated: booking.lastUpdated
+        lastUpdated: booking.lastUpdated,
+        
+        roomName: room?.name || '',
+        userName: user?.fullName || '' 
       },
       error: null
     });
