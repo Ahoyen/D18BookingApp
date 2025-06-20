@@ -88,8 +88,8 @@ router.get('/api/rooms', async (req, res) => {
       const room = await Room.findOne({ id })
         // .populate('amenities')
         // .populate('rules')
-        // .populate('host', 'id name avatar') 
-        // .lean();
+        .populate('host', 'id name avatar') 
+        .lean();
   
       if (!room) {
         return res.status(404).json({ success: false, message: 'Room not found' });
