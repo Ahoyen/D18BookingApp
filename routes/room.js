@@ -94,6 +94,11 @@ router.get('/api/rooms', async (req, res) => {
       if (!room) {
         return res.status(404).json({ success: false, message: 'Room not found' });
       }
+      // Lấy thêm thông tin amenities, rules theo `id` number
+      const amenityDocs = await Amenity.find({ id: { $in: room.amenities } }).lean();
+      const ruleDocs = await Rule.find({ id: { $in: room.rules } }).lean();
+  
+
       // Lấy reviews theo roomId
       const reviews = await Review.find({ roomId: id }).lean();
   
@@ -111,6 +116,8 @@ router.get('/api/rooms', async (req, res) => {
   
       const response = {
         ...room,
+        amenities: amenityDocs,
+        rules: ruleDocs,
         reviews,
         bookedDates,
         averageRating
